@@ -1,14 +1,39 @@
 import { ZeroExOrderBuilder, EthNetwork } from "0xorderbuilder";
 import { BigNumber } from "bignumber.js";
+import * as request from "request";
+
+const yourWalletPrivateKey = "0x4362423894789234879237894238794789237483278947823478923"; // Fake private key. Just an example
+const yourWalletAddress = "0x3264732646237842378476832786"; // Fake wallet address. Just an example
+const addressOfTheTokenYouWantToSell = "0xe41d2489571d322189246dafa5ebde1f4699f498"; // ZRX on mainnet, on this example
+const amountOfTheTokenYouWantToSell = new BigNumber(100000000000000000); // In base units. 0.1 ZRX on this example
+
+const addressOfThETokenYouWantToGet = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"; // WETH on mainnet, on this example
+
+const numberOfSecondsUntilTheOrderExpires = 100;
+const relayerUrl = "http://localhost:3000/api/v0";
+const ethNetworkInWhichTheRealyerIsConnected = EthNetwork.Mainnet;
 
 function testZeroExOrderBuilder() {
-	ZeroExOrderBuilder.buildQuoteProviderOrder("0xf60345bcff9feedb98bbdfc996b33cba00ee2c75", "0xd0a1e359811322d97991e03f863a0c30c2cf029c", 
-		"0x6ff6c0ff1d68b964901f986d4c9fa3ac68346570", new BigNumber(100000000000000), new BigNumber(100000),
-		"http://localhost:3000/api/v0", EthNetwork.Kovan).then((order: any) => {
-			const signedOrder = ZeroExOrderBuilder.buildSignedOrder(order, "0x5edd9d13a5d62821bbda8ac6da7d7ca69a1b540dc99ac9232fefc04d09e28055");
-			console.log(JSON.stringify(signedOrder));
-		});
+	ZeroExOrderBuilder.buildQuoteProviderOrder(
+		yourWalletAddress,
+		addressOfTheTokenYouWantToSell, 
+		addressOfThETokenYouWantToGet,
+		amountOfTheTokenYouWantToSell,
+		numberOfSecondsUntilTheOrderExpires * 1000,
+		relayerUrl,
+		ethNetworkInWhichTheRealyerIsConnected
+	).then((order: any) => {
+		const signedOrder = ZeroExOrderBuilder.buildSignedOrder(order, yourWalletPrivateKey);
+		console.log(JSON.stringify(signedOrder));
 
+		request.post(relayerUrl + '/order', { json: signedOrder }, (error, httpResponse, body) => {
+			console.log(error);
+			console.log(httpResponse);
+			console.log(body);
+		});
+	}).catch((error) => {
+		console.log(error);
+	});
 }
 
 testZeroExOrderBuilder();

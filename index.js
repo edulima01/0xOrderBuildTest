@@ -2,11 +2,16 @@
 exports.__esModule = true;
 var _0xorderbuilder_1 = require("0xorderbuilder");
 var bignumber_js_1 = require("bignumber.js");
+var request = require("request");
 function testZeroExOrderBuilder() {
-    _0xorderbuilder_1.ZeroExOrderBuilder.buildQuoteProviderOrder("0xb39a559ee400ed11a985d18168f2a8f10fc901f3", "0xd0a1e359811322d97991e03f863a0c30c2cf029c", "0x6ff6c0ff1d68b964901f986d4c9fa3ac68346570", new bignumber_js_1.BigNumber(100000000000000), new bignumber_js_1.BigNumber(100000000000), "http://localhost:3000/api/v0", _0xorderbuilder_1.EthNetwork.Kovan).then(function (order) {
-        var signedOrder = _0xorderbuilder_1.ZeroExOrderBuilder.buildSignedOrder(order, "0x6e52331cc0a81c73014d2289a4676952ff2364d85c1c63c126753018fd49b7e6");
+    _0xorderbuilder_1.ZeroExOrderBuilder.buildQuoteProviderOrder("0x047711f516ab00d804916df0aba15638b549cb10", "0xe41d2489571d322189246dafa5ebde1f4699f498", "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", new bignumber_js_1.BigNumber(100000000000000000), 100000, "http://localhost:3000/api/v0", _0xorderbuilder_1.EthNetwork.Mainnet).then(function (order) {
+        var signedOrder = _0xorderbuilder_1.ZeroExOrderBuilder.buildSignedOrder(order, "0x1fb6a31469f45d93b15eef7741a3501544ef73081ba33e6748ac49eb5265776f");
         console.log(JSON.stringify(signedOrder));
-    });
+        request.post('http://localhost:3000/api/v0/order', { json: signedOrder }, function (error, httpResponse, body) {
+            console.log(error);
+            console.log(httpResponse);
+            console.log(body);
+        });
+    })["catch"](function (error) { return console.log(error); });
 }
-"661728405000000000000";
 testZeroExOrderBuilder();
